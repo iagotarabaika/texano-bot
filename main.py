@@ -9,63 +9,63 @@ intents.guilds = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# 🎵 Saved radio stations
-STATIONS = {
-    "forro": "http://stm16.xcast.com.br:10582/stream",
-    "105.1 FM": "https://www.appradio.app:8010/live",
-    "radio CLUB": "https://8157.brasilstream.com.br/stream",
-    "radio Pagode": "https://stm15.xcast.com.br:12534/stream"# Add more here
+# 🎵 Estações de rádio salvas
+ESTACOES = {
+    "forró": "http://stm16.xcast.com.br:10582/stream",
+    "105.1 fm": "https://www.appradio.app:8010/live",
+    "radio club": "https://8157.brasilstream.com.br/stream",
+    "radio pagode": "https://stm15.xcast.com.br:12534/stream"
 }
 
 @bot.event
 async def on_ready():
-    print(f"✅ Logged in as {bot.user}")
+    print(f"✅ Logado como {bot.user}")
 
-@bot.command()
-async def station(ctx, name: str):
+@bot.command(name="tocar")
+async def tocar(ctx, *, nome: str):
     if ctx.author.voice:
-        url = STATIONS.get(name.lower())
+        url = ESTACOES.get(nome.lower())
         if not url:
-            await ctx.send("❌ Station not found.")
+            await ctx.send("❌ Estação não encontrada.")
             return
 
-        channel = ctx.author.voice.channel
-        vc = await channel.connect()
+        canal = ctx.author.voice.channel
+        vc = await canal.connect()
 
         if vc.is_playing():
             vc.stop()
 
-        ffmpeg_options = {
+        opcoes_ffmpeg = {
             'options': '-vn -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
         }
 
-        source = discord.FFmpegPCMAudio(url, **ffmpeg_options)
+        source = discord.FFmpegPCMAudio(url, **opcoes_ffmpeg)
         vc.play(source)
-        await ctx.send(f"📻 Now playing: **{name.title()}**")
+        await ctx.send(f"📻 Tocando agora: **{nome.title()}**")
     else:
-        await ctx.send("❌ You must be in a voice channel to play a station.")
+        await ctx.send("❌ Você precisa estar em um canal de voz para tocar uma estação.")
 
-@bot.command()
-async def stop(ctx):
+@bot.command(name="parar")
+async def parar(ctx):
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
-        await ctx.send("⛔ Radio stopped.")
+        await ctx.send("⛔ Rádio parada.")
     else:
-        await ctx.send("❌ I'm not in a voice channel.")
+        await ctx.send("❌ Não estou em um canal de voz.")
 
-@bot.command()
+@bot.command(name="menu")
 async def menu(ctx):
-    station_list = '\n'.join([f"- `{name}`" for name in STATIONS.keys()])
-    help_text = (
-        "**🎶 Comandos do bot de radio:**\n"
-        "`!radio [nome]` - Toca a estacao de radio\n"
-        "`!parar` - Para de tocar\n"
-        "`!menu` - Menu de ajuda\n\n"
-        "**📡 Estacoes de radio disponiveis:**\n"
-        f"{station_list}"
+    lista = '\n'.join([f"- `{nome}`" for nome in ESTACOES.keys()])
+    mensagem = (
+        "**🎶 Comandos disponíveis:**\n"
+        "`!tocar [nome]` - Toca a estação de rádio\n"
+        "`!parar` - Para a rádio e sai do canal\n"
+        "`!menu` - Mostra esta mensagem de ajuda\n\n"
+        "**📡 Estações disponíveis:**\n"
+        f"{lista}"
     )
-    await ctx.send(help_text)
+    await ctx.send(mensagem)
 
-# 🔐 Use Railway ENV variable directly
+# 🔐 Token do bot do ambiente do Railway
 TOKEN = os.environ["DISCORD_TOKEN"]
 bot.run(TOKEN)
