@@ -1,16 +1,15 @@
 FROM python:3.12-slim
 
-# Install ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg && apt-get clean
+# Install ffmpeg and dependencies
+RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Install yt-dlp
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
+    chmod a+rx /usr/local/bin/yt-dlp
+
+# Set up Python environment
 WORKDIR /app
-
-# Copy all files into the container
-COPY . .
-
-# Install Python packages
+COPY . /app
 RUN pip install -r requirements.txt
 
-# Start your bot
 CMD ["python", "main.py"]
