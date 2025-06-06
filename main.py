@@ -3,24 +3,25 @@ import json
 import discord
 from discord.ext import commands
 
-# Caminho para o arquivo JSON com as estações
-STATIONS_FILE = "stations.json"
+# Load or initialize radio stations
+DEFAULT_ESTACOES = {
+    "forro": "http://stm16.xcast.com.br:10582/stream",
+    "105.1": "https://www.appradio.app:8010/live",
+    "club": "https://8157.brasilstream.com.br/stream",
+    "pagode": "https://stm15.xcast.com.br:12534/stream"
+}
 
-# Carrega as estações do arquivo JSON ou cria um padrão se não existir
-if os.path.exists(STATIONS_FILE):
-    with open(STATIONS_FILE, "r", encoding="utf-8") as f:
-        ESTACOES = json.load(f)
-else:
-    ESTACOES = {
-        "forro": "http://stm16.xcast.com.br:10582/stream",
-        "105.1": "https://www.appradio.app:8010/live",
-        "club": "https://8157.brasilstream.com.br/stream",
-        "pagode": "https://stm15.xcast.com.br:12534/stream"
-    }
-    with open(STATIONS_FILE, "w", encoding="utf-8") as f:
-        json.dump(ESTACOES, f, indent=2, ensure_ascii=False)
+# Load from env variable (must be JSON string)
+try:
+    ESTACOES = json.loads(os.getenv("RADIO_STATIONS_JSON", ""))
+    if not isinstance(ESTACOES, dict):
+        ESTACOES = DEFAULT_ESTACOES
+except Exception:
+    ESTACOES = DEFAULT_ESTACOES
 
-# Discord setup
+def update_env_variable():
+    os.environ["RADIO_STATIONS_JSON"] = json.dumps(ESTACOES, ensure_ascii=False)
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
@@ -91,11 +92,9 @@ async def adicionar(ctx, nome: str, url: str):
         return
 
     ESTACOES[nome] = url
-    with open(STATIONS_FILE, "w", encoding="utf-8") as f:
-        json.dump(ESTACOES, f, indent=2, ensure_ascii=False)
-
+    update_env_variable()
     await ctx.send(f"✅ Estação `{nome}` adicionada com sucesso!")
 
-# Use Railway ENV variable
+# Discord token from env
 TOKEN = os.environ["DISCORD_TOKEN"]
 bot.run(TOKEN)
