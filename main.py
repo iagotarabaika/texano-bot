@@ -13,9 +13,9 @@ if os.path.exists(STATIONS_FILE):
 else:
     ESTACOES = {
         "forro": "http://stm16.xcast.com.br:10582/stream",
-        "105.1 fm": "https://www.appradio.app:8010/live",
-        "radio club": "https://8157.brasilstream.com.br/stream",
-        "radio pagode": "https://stm15.xcast.com.br:12534/stream"
+        "105.1": "https://www.appradio.app:8010/live",
+        "club": "https://8157.brasilstream.com.br/stream",
+        "pagode": "https://stm15.xcast.com.br:12534/stream"
     }
     with open(STATIONS_FILE, "w", encoding="utf-8") as f:
         json.dump(ESTACOES, f, indent=2, ensure_ascii=False)
