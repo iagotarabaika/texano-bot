@@ -9,7 +9,7 @@ intents.guilds = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# 🎵 Estações de rádio salvas
+# 📻 Estações de rádio salvas
 ESTACOES = {
     "forro": "http://stm16.xcast.com.br:10582/stream",
     "105.1 fm": "https://www.appradio.app:8010/live",
@@ -30,10 +30,13 @@ async def tocar(ctx, *, nome: str):
             return
 
         canal = ctx.author.voice.channel
-        vc = await canal.connect()
+        vc = ctx.voice_client
 
-        if vc.is_playing():
-            vc.stop()
+        if vc and vc.is_connected():
+            if vc.is_playing():
+                vc.stop()
+        else:
+            vc = await canal.connect()
 
         opcoes_ffmpeg = {
             'options': '-vn -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
@@ -55,17 +58,17 @@ async def parar(ctx):
 
 @bot.command(name="menu")
 async def menu(ctx):
-    lista = '\n'.join([f"- `{nome}`" for nome in ESTACOES.keys()])
-    mensagem = (
-        "**🎶 Comandos disponíveis:**\n"
-        "`!tocar [nome]` - Toca a estação de rádio\n"
-        "`!parar` - Para a rádio e sai do canal\n"
-        "`!menu` - Mostra esta mensagem de ajuda\n\n"
+    lista_estacoes = '\n'.join([f"- `{nome}`" for nome in ESTACOES.keys()])
+    texto_ajuda = (
+        "**🎶 Comandos do bot de rádio:**\n"
+        "`!tocar [nome]` - Toca uma estação de rádio\n"
+        "`!parar` - Para a rádio\n"
+        "`!menu` - Mostra este menu de ajuda\n\n"
         "**📡 Estações disponíveis:**\n"
-        f"{lista}"
+        f"{lista_estacoes}"
     )
-    await ctx.send(mensagem)
+    await ctx.send(texto_ajuda)
 
-# 🔐 Token do bot do ambiente do Railway
+# 🔐 Token da variável de ambiente no Railway
 TOKEN = os.environ["DISCORD_TOKEN"]
 bot.run(TOKEN)
