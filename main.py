@@ -9,7 +9,7 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-YOUTUBE_URL = "https://www.youtube.com/watch?v=6D7pRtsFdV0"
+YOUTUBE_URL = "http://stm16.xcast.com.br:10582/stream"
 
 @bot.event
 async def on_ready():
