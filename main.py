@@ -1,16 +1,15 @@
 import os
 import discord
+import subprocess
 from discord.ext import commands
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
-intents.guilds = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# 🔊 Forró radio stream
-FORRO_RADIO_URL = "https://cast.radios.pt/proxy/forroestacao?mp=/stream"
+YOUTUBE_URL = "https://www.youtube.com/watch?v=6D7pRtsFdV0"
 
 @bot.event
 async def on_ready():
@@ -25,15 +24,20 @@ async def radio(ctx):
         if vc.is_playing():
             vc.stop()
 
+        # Get YouTube livestream audio URL
+        ytdlp_cmd = ["yt-dlp", "-g", "-f", "bestaudio", YOUTUBE_URL]
+        stream_url = subprocess.check_output(ytdlp_cmd).decode().strip()
+
         ffmpeg_options = {
-            'options': '-vn -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+            'options': '-vn'
         }
 
-        source = discord.FFmpegPCMAudio(FORRO_RADIO_URL, **ffmpeg_options)
-        vc.play(source, after=lambda e: print(f"✅ Stream ended: {e}"))
-        await ctx.send("🎶 Now playing Forró radio!")
+        source = discord.FFmpegPCMAudio(stream_url, **ffmpeg_options)
+        vc.play(source, after=lambda e: print(f"🔚 Stream ended: {e}"))
+        await ctx.send("🎶 Now playing Forró from YouTube!")
     else:
-        await ctx.send("❌ You need to be in a voice channel to start the radio.")
+        await ctx.send("❌ You must be in a voice channel.")
 
 @bot.command()
 async def stop(ctx):
@@ -43,6 +47,4 @@ async def stop(ctx):
     else:
         await ctx.send("❌ I'm not in a voice channel.")
 
-# 🎯 Railway token setup
-TOKEN = os.environ["DISCORD_TOKEN"]
-bot.run(TOKEN)
+bot.run(os.getenv("DISCORD_TOKEN"))
