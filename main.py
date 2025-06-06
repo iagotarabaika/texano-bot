@@ -10,7 +10,7 @@ intents.guilds = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # 🎵 Saved radio stations
-ESTATIONS = {
+STATIONS = {
     "forro": "http://stm16.xcast.com.br:10582/stream",
     "105.1 FM": "https://www.appradio.app:8010/live",
     "radio CLUB": "https://8157.brasilstream.com.br/stream",
