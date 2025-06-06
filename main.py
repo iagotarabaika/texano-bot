@@ -10,7 +10,7 @@ intents.guilds = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # 🎵 Saved radio stations
-STATIONS = {
+ESTATIONS = {
     "forro": "http://stm16.xcast.com.br:10582/stream",
     "105.1 FM": "https://www.appradio.app:8010/live",
     "radio CLUB": "https://8157.brasilstream.com.br/stream",
@@ -57,11 +57,11 @@ async def stop(ctx):
 async def menu(ctx):
     station_list = '\n'.join([f"- `{name}`" for name in STATIONS.keys()])
     help_text = (
-        "**🎶 Radio Bot Commands:**\n"
-        "`!station [name]` - Play a saved radio station\n"
-        "`!stop` - Stop the radio and leave\n"
-        "`!menu` - Show this help message\n\n"
-        "**📡 Available Stations:**\n"
+        "**🎶 Comandos do bot de radio:**\n"
+        "`!radio [nome]` - Toca a estacao de radio\n"
+        "`!parar` - Para de tocar\n"
+        "`!menu` - Menu de ajuda\n\n"
+        "**📡 Estacoes de radio disponiveis:**\n"
         f"{station_list}"
     )
     await ctx.send(help_text)
