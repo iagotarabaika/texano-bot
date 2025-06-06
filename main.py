@@ -10,7 +10,7 @@ intents.guilds = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # 🔊 Forró radio stream
-FORRO_RADIO_URL = "https://stream.zeno.fm/ehbqecqs7yzuv"
+FORRO_RADIO_URL = "https://stream.zeno.fm/qfyv0mvx2a0uv"
 
 @bot.event
 async def on_ready():
