@@ -1,2 +1,8 @@
 [phases.setup]
-nixPkgs = ["ffmpeg"]
+nixpkgsArchive = "https://github.com/NixOS/nixpkgs/archive/refs/tags/22.11.tar.gz"
+
+[phases.build]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "python main.py"
