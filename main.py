@@ -1,9 +1,6 @@
 import os
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
-
-load_dotenv()  # Load DISCORD_TOKEN from .env
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -15,14 +12,13 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # 🎵 Saved radio stations
 STATIONS = {
     "forro": "http://stm16.xcast.com.br:10582/stream",
-    "example": "https://your-stream-url.com/live"  # Add more stations here
+    "example": "https://your-stream-url.com/live"  # Add more here
 }
 
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
 
-# 📻 Play a radio station
 @bot.command()
 async def station(ctx, name: str):
     if ctx.author.voice:
@@ -45,9 +41,8 @@ async def station(ctx, name: str):
         vc.play(source)
         await ctx.send(f"📻 Now playing: **{name.title()}**")
     else:
-        await ctx.send("❌ You need to be in a voice channel to use this command.")
+        await ctx.send("❌ You must be in a voice channel to play a station.")
 
-# 🛑 Stop the radio
 @bot.command()
 async def stop(ctx):
     if ctx.voice_client:
@@ -56,20 +51,19 @@ async def stop(ctx):
     else:
         await ctx.send("❌ I'm not in a voice channel.")
 
-# 📋 Show help and station list
 @bot.command()
 async def menu(ctx):
     station_list = '\n'.join([f"- `{name}`" for name in STATIONS.keys()])
     help_text = (
         "**🎶 Radio Bot Commands:**\n"
         "`!station [name]` - Play a saved radio station\n"
-        "`!stop` - Stop the radio and leave the channel\n"
+        "`!stop` - Stop the radio and leave\n"
         "`!menu` - Show this help message\n\n"
         "**📡 Available Stations:**\n"
         f"{station_list}"
     )
     await ctx.send(help_text)
 
-# 🚀 Run the bot
+# 🔐 Use Railway ENV variable directly
 TOKEN = os.environ["DISCORD_TOKEN"]
 bot.run(TOKEN)
