@@ -1,44 +1,53 @@
 import os
 import discord
-import subprocess
 from discord.ext import commands
+from dotenv import load_dotenv
+
+load_dotenv()  # Load DISCORD_TOKEN from .env
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
+intents.guilds = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-YOUTUBE_URL = "http://stm16.xcast.com.br:10582/stream"
+# 🎵 Saved radio stations
+STATIONS = {
+    "forro": "http://stm16.xcast.com.br:10582/stream",
+    "example": "https://your-stream-url.com/live"  # Add more stations here
+}
 
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
 
+# 📻 Play a radio station
 @bot.command()
-async def radio(ctx):
+async def station(ctx, name: str):
     if ctx.author.voice:
+        url = STATIONS.get(name.lower())
+        if not url:
+            await ctx.send("❌ Station not found.")
+            return
+
         channel = ctx.author.voice.channel
         vc = await channel.connect()
 
         if vc.is_playing():
             vc.stop()
 
-        # Get YouTube livestream audio URL
-        ytdlp_cmd = ["yt-dlp", "-g", "-f", "bestaudio", YOUTUBE_URL]
-        stream_url = subprocess.check_output(ytdlp_cmd).decode().strip()
-
         ffmpeg_options = {
-            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-            'options': '-vn'
+            'options': '-vn -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
         }
 
-        source = discord.FFmpegPCMAudio(stream_url, **ffmpeg_options)
-        vc.play(source, after=lambda e: print(f"🔚 Stream ended: {e}"))
-        await ctx.send("🎶 Now playing Forró from YouTube!")
+        source = discord.FFmpegPCMAudio(url, **ffmpeg_options)
+        vc.play(source)
+        await ctx.send(f"📻 Now playing: **{name.title()}**")
     else:
-        await ctx.send("❌ You must be in a voice channel.")
+        await ctx.send("❌ You need to be in a voice channel to use this command.")
 
+# 🛑 Stop the radio
 @bot.command()
 async def stop(ctx):
     if ctx.voice_client:
@@ -47,4 +56,20 @@ async def stop(ctx):
     else:
         await ctx.send("❌ I'm not in a voice channel.")
 
-bot.run(os.getenv("DISCORD_TOKEN"))
+# 📋 Show help and station list
+@bot.command()
+async def menu(ctx):
+    station_list = '\n'.join([f"- `{name}`" for name in STATIONS.keys()])
+    help_text = (
+        "**🎶 Radio Bot Commands:**\n"
+        "`!station [name]` - Play a saved radio station\n"
+        "`!stop` - Stop the radio and leave the channel\n"
+        "`!menu` - Show this help message\n\n"
+        "**📡 Available Stations:**\n"
+        f"{station_list}"
+    )
+    await ctx.send(help_text)
+
+# 🚀 Run the bot
+TOKEN = os.environ["DISCORD_TOKEN"]
+bot.run(TOKEN)
