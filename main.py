@@ -12,7 +12,9 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # 🎵 Saved radio stations
 STATIONS = {
     "forro": "http://stm16.xcast.com.br:10582/stream",
-    "example": "https://your-stream-url.com/live"  # Add more here
+    "105.1 FM": "https://www.appradio.app:8010/live",
+    "radio CLUB": "https://8157.brasilstream.com.br/stream",
+    "radio Pagode": "https://stm15.xcast.com.br:12534/stream"# Add more here
 }
 
 @bot.event
