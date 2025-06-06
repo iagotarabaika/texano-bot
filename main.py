@@ -11,7 +11,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # 🎵 Estações de rádio salvas
 ESTACOES = {
-    "forró": "http://stm16.xcast.com.br:10582/stream",
+    "forro": "http://stm16.xcast.com.br:10582/stream",
     "105.1 fm": "https://www.appradio.app:8010/live",
     "radio club": "https://8157.brasilstream.com.br/stream",
     "radio pagode": "https://stm15.xcast.com.br:12534/stream"
